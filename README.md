@@ -152,7 +152,7 @@ Both tools were tested identically and scored a **perfect 10/10 in both conditio
 |---|---|
 | `README.md` | This file — full task write-up |
 | `Prompt_Basics_Zero-Shot_vs_Few-Shot.pdf` | Polished PDF report with cover page, dataset, prompts, results, and takeaway |
-| Video (LinkedIn) | 2–3 min walkthrough of prompts, results, and takeaway — tagged **@NeuroFive Solutions** |
+| Video (LinkedIn) | 2–3 min walkthrough of prompts, results, and takeaway  |
 
 ---
 
