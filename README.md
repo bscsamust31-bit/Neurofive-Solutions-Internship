@@ -1,4 +1,6 @@
-![NeuroFive Solutions](./banner.png)
+<p align="center">
+  <img src="./neurofive_task1_assets/banner.png" width="160" height="160" style="border-radius:50%; object-fit:cover;" alt="NeuroFive Solutions"/>
+</p>
 
 # NeuroFive Internship — Task 1
 ### Prompt Basics: Zero-Shot vs Few-Shot Showdown
