@@ -1,4 +1,4 @@
-![NeuroFive Solutions](./neurofive_task1_assets/banner.png)
+![NeuroFive Solutions](./banner.png)
 
 # NeuroFive Internship — Task 1
 ### Prompt Basics: Zero-Shot vs Few-Shot Showdown
