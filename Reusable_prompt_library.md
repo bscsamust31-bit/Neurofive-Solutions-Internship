@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="C:\Users\BCS\Desktop\Smart Health Care - Pro AI\Neurofive-Solutions-Internship\banner.png" width="160" height="160" style="border-radius:50%; object-fit:cover;" alt="NeuroFive Solutions"/>
+  <img src=".\banner.png" width="160" height="160" style="border-radius:50%; object-fit:cover;" alt="NeuroFive Solutions"/>
 </p>
 
 # NeuroFive Internship — Task 2
