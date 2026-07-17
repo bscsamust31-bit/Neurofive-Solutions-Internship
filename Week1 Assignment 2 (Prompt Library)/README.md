@@ -283,7 +283,7 @@ Rewriting a support reply prompt from scratch every time costs time and produces
 |---|---|
 | `README.md` | This file — full prompt library write-up |
 | `Prompt_Library_v1.pdf` | Polished PDF version of this library |
-| Video (LinkedIn) | 2–3 min walkthrough of the template + live demo of 2 of the 5 prompts — tagged **@NeuroFive Solutions** |
+| Video (LinkedIn) | 2–3 min walkthrough of the template + live demo of 2 of the 5 prompts  |
 
 ---
 
