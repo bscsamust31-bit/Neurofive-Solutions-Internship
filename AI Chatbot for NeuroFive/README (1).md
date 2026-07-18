@@ -27,14 +27,6 @@ Unlike a generic AI chatbot, Nova:
 - Never invents account details, order numbers, or pricing it doesn't actually have
 - Stays fully in character — it never breaks the fourth wall by saying *"I'm an AI language model"*
 
-<div align="center">
-<img src="https://placehold.co/900x500/1a1a1a/22c55e?text=Chat+UI+Screenshot+Goes+Here&font=montserrat" alt="Nova Chat UI Screenshot" width="80%"/>
-
-<sub>💡 Replace this placeholder with an actual screenshot or GIF of your running chatbot before submitting.</sub>
-</div>
-
-<br/>
-
 ## 📑 Table of Contents
 
 - [Overview](#-overview)
