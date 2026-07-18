@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Neurofive Solutions — Nova Support</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --neon: #00ff41;
+    --neon-dim: #00cc33;
+    --neon-glow: rgba(0,255,65,0.25);
+    --neon-glow-strong: rgba(0,255,65,0.55);
+    --bg: #020b05;
+    --bg2: #050f07;
+    --card: #0a1a0d;
+    --border: #1a3d1f;
+    --text: #e0ffe6;
+    --text-dim: #7ab87f;
+    --user-bubble: #0d2e12;
+    --bot-bubble: #071a0a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
+
+  #landing, #chat-page {
+    position: fixed; inset: 0;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  #landing { z-index: 10; }
+  #chat-page { z-index: 5; opacity: 0; pointer-events: none; transform: translateY(20px); }
+  #chat-page.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+  #landing.hidden { opacity: 0; pointer-events: none; transform: translateY(-20px); }
+
+  /* LANDING */
+  #landing {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,255,65,0.08) 0%, transparent 60%), var(--bg);
+    overflow: hidden;
+  }
+  #landing::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,65,0.015) 3px, rgba(0,255,65,0.015) 4px);
+    pointer-events: none; z-index: 0;
+  }
+  .landing-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center; padding: 40px 24px; }
+
+  .badge {
+    font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--neon); border: 1px solid var(--neon-dim);
+    padding: 5px 16px; border-radius: 2px; box-shadow: 0 0 12px var(--neon-glow);
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+  @keyframes pulse-border { 0%,100%{box-shadow:0 0 8px var(--neon-glow);} 50%{box-shadow:0 0 22px var(--neon-glow-strong);} }
+
+  .hero-title {
+    font-family: 'Orbitron', monospace; font-size: clamp(28px, 5vw, 52px); font-weight: 900;
+    color: var(--neon); text-shadow: 0 0 10px var(--neon-glow-strong), 0 0 30px var(--neon-glow), 0 0 60px rgba(0,255,65,0.12);
+    line-height: 1.15; letter-spacing: 0.02em;
+  }
+  .hero-title span { display: block; font-size: 0.5em; font-weight: 400; color: var(--neon-dim); letter-spacing: 0.25em; text-shadow: none; margin-top: 8px; }
+
+  .hero-sub { font-size: 14px; color: var(--text-dim); max-width: 440px; line-height: 1.7; }
+
+  /* ROBOT */
+  .robot-wrap { position: relative; width: 180px; height: 200px; margin: 10px 0; }
+  .robot-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 18px rgba(0,255,65,0.5)); animation: robot-float 3s ease-in-out infinite; }
+  @keyframes robot-float { 0%,100%{transform:translateY(0px) rotate(-1deg);} 50%{transform:translateY(-12px) rotate(1deg);} }
+  .robot-shadow { position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 90px; height: 12px; background: radial-gradient(ellipse, rgba(0,255,65,0.35) 0%, transparent 80%); animation: shadow-pulse 3s ease-in-out infinite; }
+  @keyframes shadow-pulse { 0%,100%{transform:translateX(-50%) scaleX(1);opacity:0.5;} 50%{transform:translateX(-50%) scaleX(0.7);opacity:0.2;} }
+  .robot-aura { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 220px; height: 220px; border: 1px solid rgba(0,255,65,0.15); border-radius: 50%; animation: aura-spin 6s linear infinite; }
+  .robot-aura::after { content:''; position:absolute; top:8px;left:8px;right:8px;bottom:8px; border:1px solid rgba(0,255,65,0.08); border-radius:50%; }
+  @keyframes aura-spin { from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);} }
+
+  .cta-btn {
+    position: relative; font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.15em; color: var(--bg); background: var(--neon); border: none;
+    padding: 14px 40px; border-radius: 2px; cursor: pointer; text-transform: uppercase; overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 0 20px var(--neon-glow), 0 0 60px rgba(0,255,65,0.1);
+  }
+  .cta-btn::before { content:''; position:absolute; top:0;left:-100%; width:100%;height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent); transition:left 0.4s; }
+  .cta-btn:hover::before { left:100%; }
+  .cta-btn:hover { transform:translateY(-2px); box-shadow:0 0 30px var(--neon-glow-strong),0 0 80px rgba(0,255,65,0.15); }
+
+  /* CHAT PAGE */
+  #chat-page { display: flex; flex-direction: column; background: radial-gradient(ellipse at 50% 100%, rgba(0,255,65,0.05) 0%, transparent 60%), var(--bg2); }
+
+  .topbar { display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid var(--border); background:rgba(5,15,7,0.95); backdrop-filter:blur(10px); flex-shrink:0; box-shadow:0 1px 20px rgba(0,0,0,0.5); }
+  .topbar-back { background:none; border:1px solid var(--border); color:var(--text-dim); padding:6px 10px; border-radius:4px; cursor:pointer; font-size:16px; line-height:1; transition:border-color 0.2s,color 0.2s; }
+  .topbar-back:hover { border-color:var(--neon); color:var(--neon); }
+  .status-dot { width:8px;height:8px; border-radius:50%; background:var(--neon); box-shadow:0 0 8px var(--neon); animation:blink 2s ease-in-out infinite; flex-shrink:0; }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .topbar-info { flex:1; }
+  .topbar-name { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:var(--neon); }
+  .topbar-status { font-size:11px; color:var(--text-dim); margin-top:1px; }
+  .topbar-model { font-family:'Orbitron',monospace; font-size:9px; color:var(--text-dim); border:1px solid var(--border); padding:4px 8px; border-radius:3px; }
+
+  /* server badge */
+  .server-badge { font-family:'Orbitron',monospace; font-size:9px; color:#00ff41; background:#071a0a; border:1px solid #1a3d1f; padding:4px 10px; border-radius:3px; letter-spacing:0.05em; }
+
+  .messages { flex:1; overflow-y:auto; padding:24px 16px; display:flex; flex-direction:column; gap:16px; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+  .messages::-webkit-scrollbar { width:4px; }
+  .messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+  .msg-row { display:flex; gap:10px; align-items:flex-end; animation:msg-in 0.3s ease; }
+  .msg-row.user { flex-direction:row-reverse; }
+  @keyframes msg-in { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+  .avatar { width:32px;height:32px; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:16px; border:1px solid var(--border); }
+  .avatar.bot { background:var(--card); border-color:var(--neon-dim); }
+  .avatar.user-av { background:#0d2e12; }
+
+  .bubble { max-width:min(72%,520px); padding:12px 16px; border-radius:10px; font-size:14px; line-height:1.65; word-break:break-word; }
+  .bubble.bot { background:var(--bot-bubble); border:1px solid var(--border); color:var(--text); border-bottom-left-radius:2px; }
+  .bubble.user { background:var(--user-bubble); border:1px solid #1a4d22; color:var(--neon); border-bottom-right-radius:2px; text-align:right; }
+
+  .typing-dots { display:flex; gap:5px; align-items:center; padding:4px 0; }
+  .typing-dots span { width:7px;height:7px; border-radius:50%; background:var(--neon-dim); animation:dot-bounce 1.2s ease-in-out infinite; }
+  .typing-dots span:nth-child(2){animation-delay:0.2s;} .typing-dots span:nth-child(3){animation-delay:0.4s;}
+  @keyframes dot-bounce { 0%,80%,100%{transform:translateY(0);opacity:0.5;} 40%{transform:translateY(-6px);opacity:1;} }
+
+  .chips { display:flex; gap:8px; flex-wrap:wrap; padding:0 16px 6px; flex-shrink:0; }
+  .chip { font-size:11px; color:var(--text-dim); border:1px solid var(--border); padding:5px 10px; border-radius:20px; cursor:pointer; transition:all 0.2s; background:var(--card); font-family:'Inter',sans-serif; }
+  .chip:hover { border-color:var(--neon-dim); color:var(--neon); background:rgba(0,255,65,0.05); }
+
+  .input-bar { padding:14px 16px; border-top:1px solid var(--border); background:rgba(5,15,7,0.98); display:flex; gap:10px; align-items:flex-end; flex-shrink:0; }
+  #chat-input { flex:1; background:var(--card); border:1px solid var(--border); color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:12px 16px; border-radius:8px; resize:none; outline:none; min-height:44px; max-height:130px; line-height:1.5; transition:border-color 0.2s,box-shadow 0.2s; scrollbar-width:thin; }
+  #chat-input:focus { border-color:var(--neon-dim); box-shadow:0 0 0 3px rgba(0,255,65,0.08); }
+  #chat-input::placeholder { color:#3a5e3d; }
+
+  #send-btn { width:44px;height:44px; background:var(--neon); border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform 0.15s,box-shadow 0.15s; box-shadow:0 0 12px rgba(0,255,65,0.3); }
+  #send-btn:hover { transform:scale(1.07); box-shadow:0 0 22px rgba(0,255,65,0.5); }
+  #send-btn:disabled { background:#1a3d1f; box-shadow:none; cursor:not-allowed; transform:none; }
+  #send-btn svg { color:#020b05; }
+
+  .grid-bg { position:absolute; inset:0; background-image:linear-gradient(rgba(0,255,65,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,65,0.03) 1px,transparent 1px); background-size:48px 48px; pointer-events:none; }
+
+  /* connection status bar */
+  .conn-bar { padding:7px 16px; font-size:11px; font-family:'Orbitron',monospace; letter-spacing:0.05em; text-align:center; flex-shrink:0; display:none; }
+  .conn-bar.error { display:block; background:#1a0505; border-bottom:1px solid #5a1010; color:#ff6b6b; }
+  .conn-bar.ok { display:block; background:#071a0a; border-bottom:1px solid var(--border); color:var(--neon-dim); }
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="grid-bg"></div>
+  <div class="landing-inner">
+    <div class="badge">INTERN BUILD · NEUROFIVE SOLUTIONS</div>
+
+    <div class="robot-wrap">
+      <div class="robot-aura"></div>
+      <svg class="robot-svg" viewBox="0 0 180 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="glow-sm"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <linearGradient id="panelGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d2e12"/><stop offset="100%" stop-color="#071a0a"/></linearGradient>
+          <radialGradient id="antGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#00ff41"><animate attributeName="stop-opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite"/></stop><stop offset="100%" stop-color="#00ff41" stop-opacity="0"/></radialGradient>
+          <radialGradient id="bodyGrad" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="#00ff41" stop-opacity="0.25"/><stop offset="100%" stop-color="#020b05" stop-opacity="0"/></radialGradient>
+        </defs>
+        <ellipse cx="90" cy="195" rx="60" ry="6" fill="url(#bodyGrad)"/>
+        <rect x="57" y="153" width="26" height="35" rx="6" fill="url(#panelGrad)" stroke="#00ff41" stroke-width="1.2"/>
+        <rect x="97" y="153" width="26" height="35" rx="6" fill="url(#panelGrad)" stroke="#00ff41" stroke-width="1.2"/>
+        <rect x="52" y="181" width="36" height="8" rx="4" fill="#0d2e12" stroke="#00cc33" stroke-width="1"/>
+        <rect x="92" y="181" width="36" height="8" rx="4" fill="#0d2e12" stroke="#00cc33" stroke-width="1"/>
+        <rect x="40" y="90" width="100" height="68" rx="12" fill="url(#panelGrad)" stroke="#00ff41" stroke-width="1.5" filter="url(#glow-sm)"/>
+        <rect x="54" y="108" width="72" height="30" rx="5" fill="#020b05" stroke="#00cc33" stroke-width="1"/>
+        <rect x="58" y="114" width="14" height="18" rx="2" fill="#00ff41" fill-opacity="0.7"><animate attributeName="height" values="18;10;18" dur="1.1s" repeatCount="indefinite"/><animate attributeName="y" values="114;118;114" dur="1.1s" repeatCount="indefinite"/></rect>
+        <rect x="76" y="112" width="14" height="20" rx="2" fill="#00ff41" fill-opacity="0.9"><animate attributeName="height" values="20;6;20" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y" values="112;120;112" dur="0.9s" repeatCount="indefinite"/></rect>
+        <rect x="94" y="116" width="14" height="16" rx="2" fill="#00ff41" fill-opacity="0.6"><animate attributeName="height" values="16;12;16" dur="1.4s" repeatCount="indefinite"/><animate attributeName="y" values="116;114;116" dur="1.4s" repeatCount="indefinite"/></rect>
+        <rect x="112" y="113" width="10" height="19" rx="2" fill="#00ff41" fill-opacity="0.8"><animate attributeName="height" values="19;8;19" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y" values="113;119;113" dur="0.7s" repeatCount="indefinite"/></rect>
+        <rect x="10" y="92" width="30" height="52" rx="8" fill="url(#panelGrad)" stroke="#00ff41" stroke-width="1.2"/>
+        <circle cx="25" cy="148" r="7" fill="#0d2e12" stroke="#00cc33" stroke-width="1"/>
+        <circle cx="25" cy="148" r="3" fill="#00ff41" fill-opacity="0.6"/>
+        <rect x="140" y="92" width="30" height="52" rx="8" fill="url(#panelGrad)" stroke="#00ff41" stroke-width="1.2"/>
+        <circle cx="155" cy="148" r="7" fill="#0d2e12" stroke="#00cc33" stroke-width="1"/>
+        <circle cx="155" cy="148" r="3" fill="#00ff41" fill-opacity="0.6"/>
+        <rect x="77" y="80" width="26" height="14" rx="4" fill="#0a1a0d" stroke="#00cc33" stroke-width="1"/>
+        <rect x="36" y="22" width="108" height="62" rx="14" fill="url(#panelGrad)" stroke="#00ff41" stroke-width="1.8" filter="url(#glow)"/>
+        <rect x="22" y="32" width="14" height="28" rx="5" fill="url(#panelGrad)" stroke="#00cc33" stroke-width="1"/>
+        <rect x="144" y="32" width="14" height="28" rx="5" fill="url(#panelGrad)" stroke="#00cc33" stroke-width="1"/>
+        <circle cx="29" cy="46" r="4" fill="#00ff41" fill-opacity="0.3"><animate attributeName="fill-opacity" values="0.3;0.9;0.3" dur="1.8s" repeatCount="indefinite"/></circle>
+        <circle cx="151" cy="46" r="4" fill="#00ff41" fill-opacity="0.3"><animate attributeName="fill-opacity" values="0.3;0.9;0.3" dur="2.2s" repeatCount="indefinite"/></circle>
+        <rect x="53" y="38" width="28" height="16" rx="4" fill="#020b05" stroke="#00ff41" stroke-width="1.2"/>
+        <rect x="99" y="38" width="28" height="16" rx="4" fill="#020b05" stroke="#00ff41" stroke-width="1.2"/>
+        <rect x="57" y="42" width="20" height="8" rx="2" fill="#00ff41" fill-opacity="0.85" filter="url(#glow-sm)"><animate attributeName="fill-opacity" values="0.85;0.3;0.85" dur="3s" repeatCount="indefinite"/></rect>
+        <rect x="103" y="42" width="20" height="8" rx="2" fill="#00ff41" fill-opacity="0.85" filter="url(#glow-sm)"><animate attributeName="fill-opacity" values="0.85;0.3;0.85" dur="3s" repeatCount="indefinite"/></rect>
+        <rect x="63" y="66" width="54" height="10" rx="5" fill="#020b05" stroke="#00cc33" stroke-width="1"/>
+        <path d="M68 71 Q90 77 112 71" stroke="#00ff41" stroke-width="2" fill="none" stroke-linecap="round" filter="url(#glow-sm)"><animate attributeName="stroke-opacity" values="1;0.4;1" dur="2.5s" repeatCount="indefinite"/></path>
+        <line x1="90" y1="22" x2="90" y2="5" stroke="#00cc33" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="90" cy="4" r="5" fill="url(#antGrad)" filter="url(#glow)"/>
+        <circle cx="90" cy="4" r="2.5" fill="#00ff41"/>
+      </svg>
+      <div class="robot-shadow"></div>
+    </div>
+
+    <h1 class="hero-title">NEUROFIVE SOLUTIONS<span>INTERN CHATBOT · NOVA v1.0</span></h1>
+    <p class="hero-sub">Meet Nova — your AI-powered support companion. Ask about products, tech support, account help, and more.</p>
+    <button class="cta-btn" onclick="launchChat()">⚡ LAUNCH NOVA</button>
+  </div>
+</div>
+
+<!-- CHAT PAGE -->
+<div id="chat-page">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <div class="avatar bot">🤖</div>
+    <div class="status-dot"></div>
+    <div class="topbar-info">
+      <div class="topbar-name">NOVA</div>
+      <div class="topbar-status">Neurofive Solutions Support — Online</div>
+    </div>
+    <div class="server-badge">🟢 FLASK SERVER</div>
+    <div class="topbar-model">llama-3.3-70b</div>
+  </div>
+
+  <div class="conn-bar" id="conn-bar"></div>
+  <div class="messages" id="messages"></div>
+
+  <div class="chips" id="chips">
+    <button class="chip" onclick="sendChip('What can you help me with?')">👋 What can you do?</button>
+    <button class="chip" onclick="sendChip('I forgot my password and can\'t log in.')">🔐 Password reset</button>
+    <button class="chip" onclick="sendChip('Do you offer a free trial?')">🎁 Free trial?</button>
+    <button class="chip" onclick="sendChip('Is my data safe with Neurofive?')">🔒 Data safety</button>
+  </div>
+
+  <div class="input-bar">
+    <textarea id="chat-input" placeholder="Ask Nova anything about Neurofive Solutions…" rows="1"
+      onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button id="send-btn" onclick="sendMessage()" title="Send">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── Config: points to Flask backend running on chatbot.py ──
+const API_URL = "http://localhost:5000/chat";
+
+let conversationHistory = [];
+let isTyping = false;
+
+function launchChat() {
+  document.getElementById('landing').classList.add('hidden');
+  document.getElementById('chat-page').classList.add('active');
+  setTimeout(() => {
+    addBotMessage("Hey there! 👋 I'm **Nova**, your support assistant for Neurofive Solutions. What can I help you with today?");
+  }, 400);
+}
+
+function goBack() {
+  document.getElementById('landing').classList.remove('hidden');
+  document.getElementById('chat-page').classList.remove('active');
+}
+
+function addBotMessage(text, typing = false) {
+  const msgs = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+
+  const av = document.createElement('div');
+  av.className = 'avatar bot';
+  av.textContent = '🤖';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble bot';
+
+  if (typing) {
+    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+    row.id = 'typing-row';
+  } else {
+    bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+  }
+
+  row.appendChild(av);
+  row.appendChild(bubble);
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+  return row;
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  const av = document.createElement('div');
+  av.className = 'avatar user-av';
+  av.textContent = '👤';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble user';
+  bubble.textContent = text;
+  row.appendChild(av);
+  row.appendChild(bubble);
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+  document.getElementById('chips').style.display = 'none';
+}
+
+async function sendMessage(text) {
+  const input = document.getElementById('chat-input');
+  const msg = text !== undefined ? text : input.value.trim();
+  if (!msg || isTyping) return;
+  if (!text) { input.value = ''; autoResize(input); }
+
+  isTyping = true;
+  document.getElementById('send-btn').disabled = true;
+  addUserMessage(msg);
+  const typingRow = addBotMessage('', true);
+  conversationHistory.push({ role: 'user', content: msg });
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, history: conversationHistory.slice(0, -1) })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const reply = data.reply;
+    conversationHistory.push({ role: 'assistant', content: reply });
+
+    typingRow.remove();
+    addBotMessage(reply);
+
+    // show success bar once
+    const bar = document.getElementById('conn-bar');
+    if (!bar.dataset.shown) {
+      bar.textContent = '✓ Connected to chatbot.py Flask server on localhost:5000';
+      bar.className = 'conn-bar ok';
+      bar.dataset.shown = '1';
+      setTimeout(() => { bar.style.display = 'none'; }, 4000);
+    }
+
+  } catch (err) {
+    typingRow.remove();
+
+    // Show helpful error
+    let hint = err.message;
+    if (hint.includes('fetch') || hint.includes('Failed')) {
+      hint = 'Cannot reach Flask server. Is chatbot.py running? Run: python chatbot.py';
+    }
+
+    addBotMessage(`⚠️ ${hint}`);
+
+    const bar = document.getElementById('conn-bar');
+    bar.textContent = '✗ Flask server not reachable — run: python chatbot.py';
+    bar.className = 'conn-bar error';
+    bar.style.display = 'block';
+  }
+
+  isTyping = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+function sendChip(t) { sendMessage(t); }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 130) + 'px'; }
+</script>
+</body>
+</html>
