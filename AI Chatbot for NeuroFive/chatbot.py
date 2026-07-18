@@ -20,7 +20,7 @@ CORS(app)  # allow the HTML frontend to talk to this server
 # 2. OpenRouter client setup (same as original chatbot.py)
 # ---------------------------------------------------------------------------
 client = OpenAI(
-    api_key=os.environ.get("OPENROUTER_API_KEY", "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"),
+    api_key=os.environ.get("OPENROUTER_API_KEY", "Enter your Key here"),
     base_url="https://openrouter.ai/api/v1",
     default_headers={
         "HTTP-Referer": "https://github.com/",
