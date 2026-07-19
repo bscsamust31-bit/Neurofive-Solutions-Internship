@@ -21,7 +21,7 @@ import streamlit as st
 
 # ----------------------------- API Key --------------------------------------
 # Paste your Bluesmind API key here
-BLUESMIND_API_KEY = "sk-9H7eKUVVrDPtohMJxpZsYtQLBhFT0Ubu3OdxRtMRk4BNfdbx"
+BLUESMIND_API_KEY = "your key"
 BLUESMIND_BASE_URL = "https://api.bluesminds.com/v1"
 
 # Model used for all answers (fixed — no dropdown in the UI)
