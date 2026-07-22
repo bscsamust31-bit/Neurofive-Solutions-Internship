@@ -1,8 +1,6 @@
 <p align="center">
-<<<<<<< HEAD
+
   <img src=".\banner.png" width="160" height="160" style="border-radius:50%; object-fit:cover;" alt="NeuroFive Solutions"/>
-=======
- 
 </p>
 
 # NeuroFive Internship — Task 3
