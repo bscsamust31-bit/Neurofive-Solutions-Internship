@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeForge AI — Land Your Dream Job</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root{
+    --bg:#05060a;
+    --bg2:#0b0d16;
+    --accent:#7c5cff;
+    --accent2:#38e6c5;
+    --accent3:#ff5c8a;
+    --text:#eef0f8;
+    --muted:#9aa0b4;
+    --glass:rgba(255,255,255,0.06);
+    --glass-border:rgba(255,255,255,0.12);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+  }
+  #hero-canvas{position:fixed; top:0; left:0; width:100%; height:100%; z-index:0;}
+  .noise-overlay{
+    position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.03;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 6vw; backdrop-filter:blur(14px);
+    background:linear-gradient(to bottom, rgba(5,6,10,0.7), transparent);
+  }
+  .logo{font-size:22px; font-weight:800; letter-spacing:.5px;}
+  .logo span{background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .nav-links{display:flex; gap:32px; font-size:14px; color:var(--muted);}
+  .nav-links a{color:var(--muted); text-decoration:none; transition:.2s;}
+  .nav-links a:hover{color:var(--text);}
+  .status-pill{
+    display:flex; align-items:center; gap:8px; font-size:12px; padding:6px 14px;
+    border-radius:999px; border:1px solid var(--glass-border); background:var(--glass);
+  }
+  .dot{width:8px; height:8px; border-radius:50%; background:#666;}
+  .dot.on{background:var(--accent2); box-shadow:0 0 10px var(--accent2);}
+  .dot.off{background:var(--accent3); box-shadow:0 0 10px var(--accent3);}
+
+  .hero{
+    position:relative; z-index:2; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:0 6vw;
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:8px; padding:8px 18px; border-radius:999px;
+    background:var(--glass); border:1px solid var(--glass-border); font-size:13px; color:var(--muted);
+    margin-bottom:28px; animation:fadeUp .8s ease both;
+  }
+  h1.hero-title{
+    font-size:clamp(38px,7vw,84px); font-weight:800; line-height:1.05; letter-spacing:-2px;
+    animation:fadeUp .8s .1s ease both;
+  }
+  h1.hero-title .grad{
+    background:linear-gradient(90deg,var(--accent),var(--accent2) 50%,var(--accent3));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:200% auto; animation:shine 6s linear infinite;
+  }
+  .hero-sub{
+    max-width:640px; margin:24px auto 0; color:var(--muted); font-size:18px; line-height:1.6;
+    animation:fadeUp .8s .2s ease both;
+  }
+  .hero-cta{margin-top:40px; display:flex; gap:16px; animation:fadeUp .8s .3s ease both;}
+  .btn{
+    padding:16px 32px; border-radius:14px; font-size:15px; font-weight:600; cursor:pointer;
+    border:none; transition:.25s; letter-spacing:.2px;
+  }
+  .btn-primary{
+    background:linear-gradient(90deg,var(--accent),#5a3cff); color:white;
+    box-shadow:0 8px 30px rgba(124,92,255,.4);
+  }
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 12px 40px rgba(124,92,255,.55);}
+  .btn-ghost{background:var(--glass); color:var(--text); border:1px solid var(--glass-border);}
+  .btn-ghost:hover{background:rgba(255,255,255,.1);}
+  .scroll-hint{position:absolute; bottom:36px; font-size:12px; color:var(--muted); animation:bob 2s ease-in-out infinite;}
+
+  @keyframes fadeUp{from{opacity:0; transform:translateY(24px);} to{opacity:1; transform:translateY(0);}}
+  @keyframes shine{to{background-position:200% center;}}
+  @keyframes bob{0%,100%{transform:translateY(0);} 50%{transform:translateY(8px);}}
+
+  section{position:relative; z-index:2;}
+  .app-section{max-width:1180px; margin:0 auto; padding:60px 6vw 140px;}
+  .section-head{text-align:center; margin-bottom:48px;}
+  .section-head h2{font-size:clamp(28px,4vw,42px); font-weight:800; letter-spacing:-1px;}
+  .section-head p{color:var(--muted); margin-top:10px; font-size:16px;}
+
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+  @media (max-width:900px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--glass); border:1px solid var(--glass-border); border-radius:20px;
+    padding:28px; backdrop-filter:blur(20px); box-shadow:0 20px 60px rgba(0,0,0,.35);
+  }
+  .card h3{font-size:18px; margin-bottom:16px; display:flex; align-items:center; gap:10px;}
+  label{display:block; font-size:13px; color:var(--muted); margin:14px 0 6px;}
+  textarea, select, input[type=text]{
+    width:100%; background:rgba(255,255,255,.04); border:1px solid var(--glass-border);
+    color:var(--text); border-radius:12px; padding:12px 14px; font-size:14px; font-family:inherit;
+    resize:vertical; transition:.2s;
+  }
+  textarea:focus, select:focus, input:focus{outline:none; border-color:var(--accent); background:rgba(124,92,255,.06);}
+  textarea{min-height:160px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+  .dropzone{
+    border:2px dashed var(--glass-border); border-radius:14px; padding:28px; text-align:center;
+    cursor:pointer; transition:.2s; margin-top:6px; color:var(--muted); font-size:13px;
+  }
+  .dropzone.drag{border-color:var(--accent); background:rgba(124,92,255,.08); color:var(--text);}
+  .dropzone strong{color:var(--accent2);}
+
+  .analyze-bar{display:flex; gap:14px; margin-top:22px; flex-wrap:wrap;}
+  .analyze-bar .btn{flex:1; min-width:180px;}
+
+  #results{margin-top:56px; display:none;}
+  .score-ring-wrap{display:flex; align-items:center; gap:28px; flex-wrap:wrap;}
+  .score-ring{position:relative; width:150px; height:150px; flex-shrink:0;}
+  .score-ring svg{transform:rotate(-90deg);}
+  .score-ring .num{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    flex-direction:column; font-weight:800; font-size:32px;
+  }
+  .score-ring .num small{font-size:11px; color:var(--muted); font-weight:400;}
+  .breakdown{flex:1; min-width:220px; display:grid; gap:10px;}
+  .bd-row{display:grid; grid-template-columns:130px 1fr 40px; align-items:center; gap:10px; font-size:13px;}
+  .bd-bar{height:8px; border-radius:6px; background:rgba(255,255,255,.08); overflow:hidden;}
+  .bd-bar>div{height:100%; border-radius:6px; background:linear-gradient(90deg,var(--accent),var(--accent2));}
+
+  .pill-list{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+  .pill-list span{
+    background:rgba(255,255,255,.06); border:1px solid var(--glass-border); border-radius:999px;
+    padding:6px 12px; font-size:12px; color:var(--muted);
+  }
+  ul.clean{list-style:none; display:grid; gap:10px; margin-top:8px;}
+  ul.clean li{
+    padding-left:20px; position:relative; font-size:14px; line-height:1.5; color:var(--text);
+  }
+  ul.clean li::before{content:"→"; position:absolute; left:0; color:var(--accent2);}
+  .improve-item{
+    border:1px solid var(--glass-border); border-radius:14px; padding:16px; margin-top:12px;
+    background:rgba(255,255,255,.03);
+  }
+  .improve-item .tag{font-size:11px; color:var(--accent2); text-transform:uppercase; letter-spacing:.5px;}
+  .before-after{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; font-size:13px;}
+  @media (max-width:700px){.before-after{grid-template-columns:1fr;}}
+  .before-after .b{color:var(--accent3);}
+  .before-after .a{color:var(--accent2);}
+
+  .qcard{
+    border:1px solid var(--glass-border); border-radius:14px; padding:16px; margin-top:12px;
+    background:rgba(255,255,255,.03);
+  }
+  .qcard .qtype{
+    display:inline-block; font-size:10px; padding:3px 10px; border-radius:999px;
+    background:rgba(124,92,255,.18); color:var(--accent); text-transform:uppercase; margin-bottom:8px;
+  }
+
+  .priority{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px;}
+  .priority.high{background:var(--accent3);}
+  .priority.medium{background:#ffb84d;}
+  .priority.low{background:var(--accent2);}
+
+  .loader{display:none; text-align:center; padding:60px 0;}
+  .loader.active{display:block;}
+  .spinner{
+    width:56px; height:56px; margin:0 auto 20px; border-radius:50%;
+    border:3px solid rgba(124,92,255,.15); border-top-color:var(--accent);
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loader p{color:var(--muted); font-size:14px;}
+
+  .error-box{
+    display:none; margin-top:20px; padding:18px 20px; border-radius:14px;
+    background:rgba(255,92,138,.08); border:1px solid rgba(255,92,138,.35); color:#ffb3c6; font-size:14px;
+  }
+  .error-box.active{display:block;}
+
+  /* Modal for cover letter feature */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px);
+    z-index:100; display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal{
+    background:var(--bg2); border:1px solid var(--glass-border); border-radius:20px;
+    max-width:640px; width:100%; max-height:85vh; overflow-y:auto; padding:32px;
+    box-shadow:0 30px 90px rgba(0,0,0,.6);
+  }
+  .modal h3{font-size:20px; margin-bottom:6px;}
+  .modal .sub{color:var(--muted); font-size:13px; margin-bottom:20px;}
+  .modal textarea{min-height:280px; font-family:inherit; line-height:1.6;}
+  .modal-actions{display:flex; gap:12px; margin-top:18px;}
+  .close-x{
+    position:absolute; top:20px; right:24px; cursor:pointer; color:var(--muted); font-size:22px;
+    background:none; border:none;
+  }
+  .modal{position:relative;}
+
+  footer{text-align:center; color:var(--muted); font-size:13px; padding:40px 0; position:relative; z-index:2;}
+</style>
+</head>
+<body>
+
+<canvas id="hero-canvas"></canvas>
+<div class="noise-overlay"></div>
+
+<nav>
+  <div class="logo">Resume<span>Forge</span> AI</div>
+  <div class="nav-links">
+    <a href="#analyzer">Analyzer</a>
+    <a href="#features">Features</a>
+  </div>
+  <div class="status-pill">
+    <span class="dot" id="status-dot"></span>
+    <span id="status-text">Checking server…</span>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="badge">✦ AI-powered · Company-tailored · Real-time analysis</div>
+  <h1 class="hero-title">Turn your resume into<br><span class="grad">an interview magnet</span></h1>
+  <p class="hero-sub">
+    Paste your resume, pick your dream company, and get a brutally honest, company-tailored
+    breakdown — scoring, ATS fixes, interview prep, and a ready-to-send cover letter, all in seconds.
+  </p>
+  <div class="hero-cta">
+    <button class="btn btn-primary" onclick="document.getElementById('analyzer').scrollIntoView({behavior:'smooth'})">Analyze My Resume</button>
+    <button class="btn btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">See Features</button>
+  </div>
+  <div class="scroll-hint">↓ scroll to begin</div>
+</section>
+
+<section id="features" class="app-section">
+  <div class="section-head">
+    <h2>Everything you need to get the offer</h2>
+    <p>Real AI output — no canned templates, no placeholder scores.</p>
+  </div>
+  <div class="grid">
+    <div class="card"><h3>📊 Deep Resume Scoring</h3><p style="color:var(--muted); font-size:14px; line-height:1.6;">Overall + 5-axis breakdown: content quality, formatting, keyword optimization, impact metrics, and company fit.</p></div>
+    <div class="card"><h3>🎯 Company-Tailored Insights</h3><p style="color:var(--muted); font-size:14px; line-height:1.6;">Recommendations built around the target company's real culture, values, and interview style.</p></div>
+    <div class="card"><h3>🧠 Interview Prep Engine</h3><p style="color:var(--muted); font-size:14px; line-height:1.6;">Likely questions by type, talking points to lean into, and red flags to prepare for.</p></div>
+    <div class="card"><h3>✉️ NEW — AI Cover Letter Generator</h3><p style="color:var(--muted); font-size:14px; line-height:1.6;">One click turns your resume + job description into a tailored, ready-to-send cover letter with a subject line, in the tone you choose.</p></div>
+  </div>
+</section>
+
+<section id="analyzer" class="app-section">
+  <div class="section-head">
+    <h2>Run Your Analysis</h2>
+    <p>Upload a file or paste your resume text — the server handles the rest.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>📄 Your Resume</h3>
+      <div class="dropzone" id="dropzone">
+        Drag & drop your resume here (.pdf, .docx, .txt) or <strong>click to browse</strong>
+        <input type="file" id="file-input" accept=".pdf,.docx,.txt" style="display:none;">
+      </div>
+      <label>Or paste resume text</label>
+      <textarea id="resume-text" placeholder="Paste your full resume text here..."></textarea>
+    </div>
+
+    <div class="card">
+      <h3>🎯 Target Role</h3>
+      <label>Target Company</label>
+      <select id="company-select"><option value="generic">Loading companies…</option></select>
+      <label>Experience Level</label>
+      <select id="experience-level">
+        <option>Entry-Level</option>
+        <option selected>Mid-Level</option>
+        <option>Senior</option>
+        <option>Staff/Principal</option>
+      </select>
+      <label>Job Description (optional, improves accuracy)</label>
+      <textarea id="job-description" style="min-height:100px;" placeholder="Paste the job posting here for sharper keyword matching..."></textarea>
+    </div>
+  </div>
+
+  <div class="analyze-bar">
+    <button class="btn btn-primary" id="analyze-btn">Analyze Resume →</button>
+    <button class="btn btn-ghost" id="cover-letter-btn">✉️ Generate Cover Letter</button>
+  </div>
+
+  <div class="error-box" id="error-box"></div>
+
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <p id="loader-text">Calling the AI engine…</p>
+  </div>
+
+  <div id="results"></div>
+</section>
+
+<footer>Built for Peridoura-grade attention to detail — ResumeForge AI</footer>
+
+<!-- Cover letter modal -->
+<div class="modal-overlay" id="cl-modal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h3>✉️ Your Tailored Cover Letter</h3>
+    <div class="sub" id="cl-subject"></div>
+    <textarea id="cl-body" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="copyLetter()">Copy to Clipboard</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= THREE.JS ANIMATED HERO BACKGROUND ================= */
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.z = 30;
+
+  const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // Particle field
+  const particleCount = 900;
+  const positions = new Float32Array(particleCount * 3);
+  for(let i=0;i<particleCount;i++){
+    positions[i*3] = (Math.random()-0.5)*120;
+    positions[i*3+1] = (Math.random()-0.5)*120;
+    positions[i*3+2] = (Math.random()-0.5)*80;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({color:0x7c5cff, size:0.5, transparent:true, opacity:0.6});
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+
+  // Floating geometric shapes
+  const shapes = [];
+  const shapeGeos = [
+    new THREE.IcosahedronGeometry(3, 0),
+    new THREE.OctahedronGeometry(2.5, 0),
+    new THREE.TorusGeometry(2.2, 0.7, 12, 24),
+    new THREE.TetrahedronGeometry(2.6, 0)
+  ];
+  const colors = [0x7c5cff, 0x38e6c5, 0xff5c8a, 0x5a3cff];
+  for(let i=0;i<10;i++){
+    const g = shapeGeos[i % shapeGeos.length];
+    const m = new THREE.MeshBasicMaterial({color: colors[i % colors.length], wireframe:true, transparent:true, opacity:0.35});
+    const mesh = new THREE.Mesh(g, m);
+    mesh.position.set((Math.random()-0.5)*60, (Math.random()-0.5)*40, (Math.random()-0.5)*40 - 10);
+    mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+    mesh.userData = {
+      rotSpeedX: (Math.random()-0.5)*0.006,
+      rotSpeedY: (Math.random()-0.5)*0.006,
+      floatSpeed: 0.2 + Math.random()*0.3,
+      floatOffset: Math.random()*Math.PI*2
+    };
+    scene.add(mesh);
+    shapes.push(mesh);
+  }
+
+  let mouseX = 0, mouseY = 0;
+  window.addEventListener('mousemove', (e)=>{
+    mouseX = (e.clientX/window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY/window.innerHeight - 0.5) * 2;
+  });
+
+  window.addEventListener('resize', ()=>{
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  const clock = new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    points.rotation.y = t * 0.02;
+    points.rotation.x = t * 0.01;
+
+    shapes.forEach(s=>{
+      s.rotation.x += s.userData.rotSpeedX;
+      s.rotation.y += s.userData.rotSpeedY;
+      s.position.y += Math.sin(t*s.userData.floatSpeed + s.userData.floatOffset) * 0.01;
+    });
+
+    camera.position.x += (mouseX*4 - camera.position.x) * 0.02;
+    camera.position.y += (-mouseY*4 - camera.position.y) * 0.02;
+    camera.lookAt(scene.position);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+/* ================= APP LOGIC ================= */
+let extractedResumeText = "";
+
+async function checkStatus(){
+  try{
+    const res = await fetch('/api/status');
+    const data = await res.json();
+    const dot = document.getElementById('status-dot');
+    const txt = document.getElementById('status-text');
+    if(data.api_configured){
+      dot.className = 'dot on';
+      txt.textContent = 'AI engine connected';
+    } else {
+      dot.className = 'dot off';
+      txt.textContent = 'API key not configured';
+    }
+  }catch(e){
+    document.getElementById('status-text').textContent = 'Server unreachable';
+  }
+}
+checkStatus();
+
+async function loadCompanies(){
+  try{
+    const res = await fetch('/api/companies');
+    const companies = await res.json();
+    const select = document.getElementById('company-select');
+    select.innerHTML = '';
+    companies.forEach(c=>{
+      const opt = document.createElement('option');
+      opt.value = c.id; opt.textContent = c.name;
+      select.appendChild(opt);
+    });
+    const genericOpt = document.createElement('option');
+    genericOpt.value = 'generic'; genericOpt.textContent = 'Other / Generic';
+    select.appendChild(genericOpt);
+  }catch(e){
+    document.getElementById('company-select').innerHTML = '<option value="generic">Generic</option>';
+  }
+}
+loadCompanies();
+
+/* Drag & drop resume upload */
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('file-input');
+dropzone.addEventListener('click', ()=>fileInput.click());
+['dragover','dragenter'].forEach(evt=>{
+  dropzone.addEventListener(evt, e=>{e.preventDefault(); dropzone.classList.add('drag');});
+});
+['dragleave','drop'].forEach(evt=>{
+  dropzone.addEventListener(evt, e=>{e.preventDefault(); dropzone.classList.remove('drag');});
+});
+dropzone.addEventListener('drop', e=>{
+  const file = e.dataTransfer.files[0];
+  if(file) uploadResumeFile(file);
+});
+fileInput.addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(file) uploadResumeFile(file);
+});
+
+async function uploadResumeFile(file){
+  dropzone.innerHTML = `Reading <strong>${file.name}</strong>…`;
+  const formData = new FormData();
+  formData.append('file', file);
+  try{
+    const res = await fetch('/api/upload-resume', {method:'POST', body:formData});
+    const data = await res.json();
+    if(!res.ok){
+      showError(data.message || 'Could not read that file.');
+      dropzone.innerHTML = `Drag & drop your resume here (.pdf, .docx, .txt) or <strong>click to browse</strong>`;
+      return;
+    }
+    document.getElementById('resume-text').value = data.resume_text;
+    extractedResumeText = data.resume_text;
+    dropzone.innerHTML = `✅ Loaded <strong>${data.filename}</strong> — text extracted below (edit if needed)`;
+  }catch(e){
+    showError('Upload failed: ' + e.message);
+  }
+}
+
+function showError(msg){
+  const box = document.getElementById('error-box');
+  box.textContent = '⚠ ' + msg;
+  box.classList.add('active');
+  setTimeout(()=>box.classList.remove('active'), 9000);
+}
+function hideError(){
+  document.getElementById('error-box').classList.remove('active');
+}
+
+function getFormValues(){
+  return {
+    resume_text: document.getElementById('resume-text').value,
+    job_description: document.getElementById('job-description').value,
+    company_name: document.getElementById('company-select').value,
+    experience_level: document.getElementById('experience-level').value
+  };
+}
+
+document.getElementById('analyze-btn').addEventListener('click', async ()=>{
+  hideError();
+  const payload = getFormValues();
+  if(!payload.resume_text || payload.resume_text.trim().length < 50){
+    showError('Please paste or upload a resume with at least 50 characters.');
+    return;
+  }
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('loader').classList.add('active');
+  document.getElementById('loader-text').textContent = 'Calling the AI engine — analyzing your resume…';
+
+  try{
+    const res = await fetch('/api/analyze', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    document.getElementById('loader').classList.remove('active');
+
+    if(!res.ok || data.error){
+      showError(data.message || 'Analysis failed. Please check the server API key configuration.');
+      return;
+    }
+    renderResults(data);
+  }catch(e){
+    document.getElementById('loader').classList.remove('active');
+    showError('Network error: ' + e.message);
+  }
+});
+
+document.getElementById('cover-letter-btn').addEventListener('click', async ()=>{
+  hideError();
+  const payload = getFormValues();
+  if(!payload.resume_text || payload.resume_text.trim().length < 50){
+    showError('Please paste or upload a resume with at least 50 characters first.');
+    return;
+  }
+  payload.tone = 'Professional and confident';
+
+  document.getElementById('loader').classList.add('active');
+  document.getElementById('loader-text').textContent = 'Calling the AI engine — writing your cover letter…';
+
+  try{
+    const res = await fetch('/api/cover-letter', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    document.getElementById('loader').classList.remove('active');
+
+    if(!res.ok || data.error){
+      showError(data.message || 'Cover letter generation failed.');
+      return;
+    }
+    document.getElementById('cl-subject').textContent = 'Subject: ' + (data.subject_line || '');
+    document.getElementById('cl-body').value = data.cover_letter || '';
+    document.getElementById('cl-modal').classList.add('active');
+  }catch(e){
+    document.getElementById('loader').classList.remove('active');
+    showError('Network error: ' + e.message);
+  }
+});
+
+function closeModal(){ document.getElementById('cl-modal').classList.remove('active'); }
+function copyLetter(){
+  const ta = document.getElementById('cl-body');
+  ta.select();
+  document.execCommand('copy');
+}
+
+function renderResults(data){
+  const el = document.getElementById('results');
+  const sb = data.score_breakdown || {};
+  const circumference = 2 * Math.PI * 65;
+  const scorePct = (data.overall_score || 0) / 100;
+  const dashOffset = circumference * (1 - scorePct);
+
+  const breakdownRows = Object.entries(sb).map(([k,v])=>`
+    <div class="bd-row">
+      <div>${k.replace(/_/g,' ')}</div>
+      <div class="bd-bar"><div style="width:${v}%"></div></div>
+      <div>${v}</div>
+    </div>`).join('');
+
+  const strengths = (data.strengths||[]).map(s=>`<li>${s}</li>`).join('');
+  const weaknesses = (data.weaknesses||[]).map(s=>`<li>${s}</li>`).join('');
+  const keywords = (data.missing_keywords||[]).map(k=>`<span>${k}</span>`).join('');
+  const improvements = (data.suggested_improvements||[]).map(imp=>`
+    <div class="improve-item">
+      <div class="tag">${imp.section}</div>
+      <div class="before-after">
+        <div><strong>Before:</strong> <span class="b">${imp.current}</span></div>
+        <div><strong>After:</strong> <span class="a">${imp.suggested}</span></div>
+      </div>
+      <p style="margin-top:8px; color:var(--muted); font-size:13px;">${imp.impact}</p>
+    </div>`).join('');
+  const recs = (data.tailored_recommendations||[]).map(r=>`<li>${r}</li>`).join('');
+
+  const ip = data.interview_prep || {};
+  const questions = (ip.likely_questions||[]).map(q=>`
+    <div class="qcard">
+      <span class="qtype">${q.type}</span>
+      <p style="font-weight:600;">${q.question}</p>
+      <p style="color:var(--muted); font-size:13px; margin-top:6px;">💡 ${q.preparation_tip}</p>
+    </div>`).join('');
+  const talkingPoints = (ip.talking_points||[]).map(t=>`<li>${t}</li>`).join('');
+  const redFlags = (ip.red_flags_to_address||[]).map(t=>`<li>${t}</li>`).join('');
+
+  const ats = data.ats_optimization || {};
+  const atsIssues = (ats.issues||[]).map(i=>`<li>${i}</li>`).join('');
+  const atsFixes = (ats.fixes||[]).map(i=>`<li>${i}</li>`).join('');
+
+  const actionPlan = (data.action_plan||[]).map(a=>`
+    <div class="improve-item" style="display:flex; align-items:center; justify-content:space-between;">
+      <div><span class="priority ${a.priority}"></span>${a.action}</div>
+      <div style="color:var(--muted); font-size:12px;">${a.time_estimate}</div>
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="card">
+      <h3>🏆 Overall Score</h3>
+      <div class="score-ring-wrap">
+        <div class="score-ring">
+          <svg width="150" height="150">
+            <circle cx="75" cy="75" r="65" stroke="rgba(255,255,255,.08)" stroke-width="12" fill="none"/>
+            <circle cx="75" cy="75" r="65" stroke="url(#grad)" stroke-width="12" fill="none"
+              stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}" stroke-linecap="round"/>
+            <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#38e6c5"/>
+            </linearGradient></defs>
+          </svg>
+          <div class="num">${data.overall_score}<small>/ 100</small></div>
+        </div>
+        <div class="breakdown">${breakdownRows}</div>
+      </div>
+      <p style="margin-top:20px; color:var(--muted); font-size:14px; line-height:1.6;">${data.executive_summary || ''}</p>
+    </div>
+
+    <div class="grid" style="margin-top:24px;">
+      <div class="card"><h3>✅ Strengths</h3><ul class="clean">${strengths}</ul></div>
+      <div class="card"><h3>⚠️ Weaknesses</h3><ul class="clean">${weaknesses}</ul></div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h3>🔑 Missing Keywords</h3>
+      <div class="pill-list">${keywords}</div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h3>✍️ Suggested Improvements</h3>
+      ${improvements}
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h3>🎯 Tailored Recommendations</h3>
+      <ul class="clean">${recs}</ul>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h3>🗣️ Interview Prep</h3>
+      ${questions}
+      <div class="grid" style="margin-top:16px;">
+        <div><h4 style="font-size:14px; margin-bottom:8px; color:var(--accent2);">Talking Points</h4><ul class="clean">${talkingPoints}</ul></div>
+        <div><h4 style="font-size:14px; margin-bottom:8px; color:var(--accent3);">Red Flags to Address</h4><ul class="clean">${redFlags}</ul></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h3>🤖 ATS Optimization — Score: ${ats.score ?? '-'}/100</h3>
+      <div class="grid">
+        <div><h4 style="font-size:14px; margin-bottom:8px;">Issues</h4><ul class="clean">${atsIssues}</ul></div>
+        <div><h4 style="font-size:14px; margin-bottom:8px;">Fixes</h4><ul class="clean">${atsFixes}</ul></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h3>📋 Action Plan</h3>
+      ${actionPlan}
+    </div>
+  `;
+  el.style.display = 'block';
+  el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
+</body>
+</html>
